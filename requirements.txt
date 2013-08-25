@@ -1,0 +1,4 @@
+boto
+pypng
+numpy
+pyfits
