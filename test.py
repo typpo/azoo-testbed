@@ -1,76 +1,26 @@
 #!/usr/bin/env python
 
 import sys
+import os
+import f2n
 import pyfits
-import png
-import binascii
 
-hdulist = pyfits.open('fits.fits')
-print hdulist.info()
+#hdulist = pyfits.open('fits.fits')
+#hdulist = pyfits.open('01_12DEC08_FL0802_0001.fits')
 
-im = hdulist[0]
-'''
-print im
-im.header['ZIMAGE'] = 'T'
-im.header['ZCMPTYPE'] = 'HCOMPRESS_1'
-im.header['ZBITPIX'] = 16
-im.header['ZNAXIS'] = 2
-im.header['ZNAXIS1'] = 4110
-im.header['ZNAXIS2'] = 4096
+def decompress(filepath):
+  os.system('hdecompress %s' % filepath)
+  return filepath.replace('arch.H', 'arch')
 
-#im.update_header()
+def process(compressed_filepath):
+  filepath = decompress(compressed_filepath)
 
-hdulist.writeto('poop.fits', clobber=True)
-'''
+  im = f2n.fromfits(filepath)
+  im.makepilimage('lin', negative=False)
+  im.tonet('nettest.png')
 
-print len(im.data)
-
-hdulist.writeto('uncompressed.fits', clobber=True)
-sys.exit(1)
-
-IMAGE_WIDTH = 2000
-
-f = open('fits.fits', 'rb')
-headerbytes = f.read(8000)
-
-bytes = 0
-pixelcount = 0
-rows = []
-flatpixels = []
-more = True
-out_data = open('data.data', 'wb')
-while more:
-  row = []
-  for px in range(IMAGE_WIDTH):
-    pixel = f.read(2)  # 2 bytes per pixel
-    if pixel == '':
-      print 'EOF. %d bytes, %d pixelcount' % (bytes, pixelcount)
-      print 'Done.'
-      more = False
-      break
-    out_data.write(pixel)
-    bytes += 2
-    pixelcount += 1
-    hexstr = ''.join(["{0:x}".format(ord(b)) for b in pixel])
-    intval = int(hexstr, 16)
-    row.append(intval)
-    flatpixels.append(intval)
-    #print binascii.hexlify(pixel)
-    #print intval
-  rows.append(row)
-
-sys.exit(1)
-out_data.close()
-
-out = open('png.png', 'w')
-w = png.Writer(IMAGE_WIDTH, len(rows), greyscale=True, bytes_per_sample=2)
-#w.write(out, rows)
-w.write_array(out, flatpixels)
-
-"""
-hdulist = pyfits.open('fits.fits')
-
-im = hdulist[0]
-im.update_header()
-im.size = bytes
-"""
+if __name__ == "__main__":
+  if len(sys.argv) > 1:
+    process(sys.argv[1])
+  else:
+    print 'usage: process filepath.arch.H'
