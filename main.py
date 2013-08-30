@@ -4,6 +4,7 @@ import sys
 import os
 import f2n
 import pyfits
+import json
 
 OUTPUT_DIR = 'processed'
 FRAME_SIZE = 512    # in pixels
@@ -21,15 +22,22 @@ def get_cropped_image(filepath, xmin, xmax, ymin, ymax):
   return im
 
 def process_cropped_frame(im, filename, framenum):
-  # TODO save raw images
+  # TODO save raw fits images
 
   # Make log scaled image - png
   im.makepilimage('log', negative=False)
-  im.tonet('%s/%s-%d-scaled.png' % (OUTPUT_DIR, filename, framenum))
+  scaled_path = '%s/%s-%d-scaled.png' % (OUTPUT_DIR, filename, framenum)
+  im.tonet(scaled_path)
 
   # Make negative log scaled image - png
   im.makepilimage('log', negative=True)
-  im.tonet('%s/%s-%d-negative.png' % (OUTPUT_DIR, filename, framenum))
+  negative_path = '%s/%s-%d-negative.png' % (OUTPUT_DIR, filename, framenum)
+  im.tonet(negative_path)
+
+  return {
+      'scaled_path': scaled_path,
+      'negative_path': negative_path,
+      }
 
 
 def process(compressed_filepath):
@@ -43,16 +51,31 @@ def process(compressed_filepath):
   # Crop image into multiple overlapping frames
   overlap_px_delta = (1.-OVERLAP_RATIO) * FRAME_SIZE
   # TODO assumes perfect fit - do we ever deal with edges?
+  metadatas = []
   while xmax < IMAGE_WIDTH:
     while ymax < IMAGE_HEIGHT:
       num_frames += 1
       im_frame = get_cropped_image(filepath, xmin, xmax, ymin, ymax)
-      process_cropped_frame(im_frame, filename, num_frames)
+      metadata = process_cropped_frame(im_frame, filename, num_frames)
 
+      metadata['crop'] = {
+          'xmin': xmin,
+          'xmax': xmax,
+          'ymin': ymin,
+          'ymax': ymax,
+          }
+      metadatas.append(metadata)
       ymax += overlap_px_delta
       ymin += overlap_px_delta
     xmax += overlap_px_delta
     xmin += overlap_px_delta
+
+    f = open('%s/%s.json' % (OUTPUT_DIR, filename), 'w')
+    f.write(json.dumps({
+      'processed_images': metadatas,
+      'original_path': compressed_filepath
+      }, indent=2))
+    f.close()
 
 
 if __name__ == "__main__":
