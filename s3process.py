@@ -3,6 +3,7 @@
 from boto.s3.connection import S3Connection
 import multiprocessing
 import sys
+import os
 import aws_config
 import fitsprocess
 import util
