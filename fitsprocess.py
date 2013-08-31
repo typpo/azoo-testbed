@@ -41,11 +41,16 @@ def process_cropped_frame(im, filename, framenum):
 
 
 def process(compressed_filepath):
+  newfiles = []
   filepath = decompress(compressed_filepath)
   filename = os.path.splitext(filepath)[0]
   if filename.startswith(RAW_DIR):
     # this is ugly - output dir should be one of the inputs
     filename = filename.replace('%s/' % RAW_DIR, '')
+  clean_compressed_filepath = compressed_filepath
+  if clean_compressed_filepath.startswith(RAW_DIR):
+    clean_compressed_filepath = \
+      clean_compressed_filepath.replace('%s/' % RAW_DIR, '')
 
   util.make_dir_for_file('%s/%s' % (OUTPUT_DIR, filename))
 
@@ -70,17 +75,24 @@ def process(compressed_filepath):
           'ymax': ymax,
           }
       metadatas.append(metadata)
+      newfiles.extend([metadata['scaled_path'], metadata['negative_path']])
+
       ymax += overlap_px_delta
       ymin += overlap_px_delta
     xmax += overlap_px_delta
     xmin += overlap_px_delta
 
-    f = open('%s/%s.json' % (OUTPUT_DIR, filename), 'w')
+    json_metadata_file = '%s/%s.json' % (OUTPUT_DIR, filename)
+    f = open(json_metadata_file, 'w')
     f.write(json.dumps({
       'processed_images': metadatas,
-      'original_path': compressed_filepath
+      'original_path': clean_compressed_filepath
       }, indent=2))
     f.close()
+
+    newfiles.append(json_metadata_file)
+
+  return newfiles
 
 
 if __name__ == "__main__":

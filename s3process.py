@@ -32,13 +32,17 @@ def process_key(key):
 
   key.get_contents_to_filename(raw_filepath)
 
-  fitsprocess.process(raw_filepath)
+  newfiles = fitsprocess.process(raw_filepath)
+  for filepath in newfiles:
+    key = bucket.new_key(filepath)
+    key.set_contents_from_filename(filepath)
+
 
 #for key in fitskeys:
 #  process_key(key)
 
 pool = multiprocessing.Pool(multiprocessing.cpu_count())
-pool.map(process_key, fitskeys[:15])
+pool.map(process_key, fitskeys[:1000])
 
 #test = bucket.get_key('Test_Folder/Chelya_orb.png')
 #test.set_canned_acl('public-read')
