@@ -85,7 +85,7 @@ def process(compressed_filepath):
     ymax = FRAME_SIZE
 
     json_metadata_file = '%s/%s.json' % (OUTPUT_DIR, filename)
-    f = open(json_metadata_file, 'w')
+    f = open(json_metadata_file, 'w', 0)
     f.write(json.dumps({
       'processed_images': metadatas,
       'original_path': clean_compressed_filepath
