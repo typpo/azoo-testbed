@@ -81,7 +81,8 @@ def process(compressed_filepath):
       ymin += overlap_px_delta
     xmax += overlap_px_delta
     xmin += overlap_px_delta
-    ymax = ymin = 0
+    ymin = 0
+    ymax = FRAME_SIZE
 
     json_metadata_file = '%s/%s.json' % (OUTPUT_DIR, filename)
     f = open(json_metadata_file, 'w')
