@@ -1,0 +1,2 @@
+ACCESS_KEY = 'abcdefgh'
+SECRET_KEY = '12345678'

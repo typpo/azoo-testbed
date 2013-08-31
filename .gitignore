@@ -5,3 +5,5 @@
 *.pyc
 venv
 processed
+raw
+aws_config.py

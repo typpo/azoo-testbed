@@ -5,15 +5,17 @@ import os
 import f2n
 import pyfits
 import json
+import util
 
 OUTPUT_DIR = 'processed'
+RAW_DIR = 'raw'
 FRAME_SIZE = 512    # in pixels
 IMAGE_HEIGHT = 4096
 IMAGE_WIDTH = 4110
 OVERLAP_RATIO = .11
 
 def decompress(filepath):
-  os.system('hdecompress %s' % filepath)
+  os.system('hdecompress "%s"' % filepath)
   return filepath.replace('arch.H', 'arch')
 
 def get_cropped_image(filepath, xmin, xmax, ymin, ymax):
@@ -22,8 +24,6 @@ def get_cropped_image(filepath, xmin, xmax, ymin, ymax):
   return im
 
 def process_cropped_frame(im, filename, framenum):
-  # TODO save raw fits images
-
   # Make log scaled image - png
   im.makepilimage('log', negative=False)
   scaled_path = '%s/%s-%d-scaled.png' % (OUTPUT_DIR, filename, framenum)
@@ -43,6 +43,11 @@ def process_cropped_frame(im, filename, framenum):
 def process(compressed_filepath):
   filepath = decompress(compressed_filepath)
   filename = os.path.splitext(filepath)[0]
+  if filename.startswith(RAW_DIR):
+    # this is ugly - output dir should be one of the inputs
+    filename = filename.replace('%s/' % RAW_DIR, '')
+
+  util.make_dir_for_file('%s/%s' % (OUTPUT_DIR, filename))
 
   xmin = ymin = 0
   xmax = ymax = FRAME_SIZE
