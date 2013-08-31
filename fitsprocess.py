@@ -84,17 +84,17 @@ def process(compressed_filepath):
     ymin = 0
     ymax = FRAME_SIZE
 
-    json_metadata_file = '%s/%s.json' % (OUTPUT_DIR, filename)
-    f = open(json_metadata_file, 'w', 0)
-    f.write(json.dumps({
-      'processed_images': metadatas,
-      'original_path': clean_compressed_filepath
-      }, indent=2))
-    os.fsync(f.fileno())
-    f.flush()
-    f.close()
+  json_metadata_file = '%s/%s.json' % (OUTPUT_DIR, filename)
+  f = open(json_metadata_file, 'w', 0)
+  f.write(json.dumps({
+    'processed_images': metadatas,
+    'original_path': clean_compressed_filepath
+    }, indent=2))
+  os.fsync(f.fileno())
+  f.flush()
+  f.close()
 
-    newfiles.append(json_metadata_file)
+  newfiles.append(json_metadata_file)
 
   return newfiles
 
