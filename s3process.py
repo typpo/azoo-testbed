@@ -37,8 +37,8 @@ def process_key(key):
   for filepath in newfiles:
     key = bucket.new_key(filepath)
     key.set_contents_from_filename(filepath)
-    os.path.remove(filepath)
-  os.path.remove(raw_filepath)
+    os.remove(filepath)
+  os.remove(raw_filepath)
 
 
 #for key in fitskeys:
