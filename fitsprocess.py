@@ -90,8 +90,6 @@ def process(compressed_filepath):
     'processed_images': metadatas,
     'original_path': clean_compressed_filepath
     }, indent=2))
-  os.fsync(f.fileno())
-  f.flush()
   f.close()
 
   newfiles.append(json_metadata_file)

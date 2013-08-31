@@ -37,16 +37,10 @@ def process_key(key):
   newfiles = fitsprocess.process(raw_filepath)
   for filepath in newfiles:
     key = bucket.new_key(filepath)
-    if not os.path.exists(filepath):
-      # wait for file to be written by OS
-      for i in range(3):
-        time.sleep(2)
-        if os.path.exists(filepath):
-          break
-
     key.set_contents_from_filename(filepath)
     os.remove(filepath)
   os.remove(raw_filepath)
+  os.remove(raw_filepath.replace('arch.H', 'arch'))
 
 
 #for key in fitskeys:
