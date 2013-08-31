@@ -1,8 +1,10 @@
 #!/bin/bash -e
-# Prerequisite: git clone https://github.com/typpo/azoo-testbed.git
+# Prerequisites:
+# git clone https://github.com/typpo/azoo-testbed.git
+# git clone https://github.com/typpo/hcompress-unix.git
 #
 
-sudo apt-get install -y build-essential python-virtualenv python-pip htop
+sudo apt-get install -y build-essential python-virtualenv python-pip python-dev csh htop
 
 virtualenv venv
 source venv/bin/activate
